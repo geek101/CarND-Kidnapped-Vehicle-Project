@@ -9,18 +9,24 @@
 #ifndef PARTICLE_FILTER_H_
 #define PARTICLE_FILTER_H_
 
+#include <utility>
 #include "helper_functions.h"
+
 
 struct Particle {
 
-	int id;
-	double x;
-	double y;
-	double theta;
-	double weight;
-	std::vector<int> associations;
-	std::vector<double> sense_x;
-	std::vector<double> sense_y;
+  int id;
+  double x;
+  double y;
+  double theta;
+  double weight;
+  std::vector<int> associations;
+  std::vector<double> sense_x;
+  std::vector<double> sense_y;
+  Particle() {};
+  Particle(const Particle& p) : id(p.id), x(p.x), y(p.y), theta(p.theta), weight(p.weight), associations(p.associations),
+    sense_x(p.sense_x), sense_y(p.sense_y) {};
+  Particle(int id, double x, double y, double theta) : id(id), x(x), y(y), theta(theta), weight(1) {};
 };
 
 
@@ -78,7 +84,8 @@ public:
 	 * @param predicted Vector of predicted landmark observations
 	 * @param observations Vector of landmark observations
 	 */
-	void dataAssociation(std::vector<LandmarkObs> predicted, std::vector<LandmarkObs>& observations);
+	std::vector<std::pair<int, int>> dataAssociation(const std::vector<LandmarkObs>& predicted,
+                                                    const std::vector<LandmarkObs>& observations);
 	
 	/**
 	 * updateWeights Updates the weights for each particle based on the likelihood of the 
@@ -115,6 +122,10 @@ public:
 	const bool initialized() const {
 		return is_initialized;
 	}
+
+        static std::pair<double, double> translateRotateXY(const double xp, const double yp, const double xc,
+                                                            const double yc, const double theta);
+        static double probXY(double x, double y, double ux, double uy, double sigx, double sigy);
 };
 
 
